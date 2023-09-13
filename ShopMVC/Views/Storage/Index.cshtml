@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model List<ProductCartViewModel>
+@inject UserManager<User> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+@{
+    string productImagePlaceholder = @"https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+}
+
+<div class="container">
+    @if (Model.Any())
+    {
+        <h3>Count product: @Model.Count()</h3>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Current Quantity</th>
+                        <th scope="col" class="d-flex justify-content-center">Operations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <th scope="row">@product.Product.Id</th>
+                            <td>
+                                <img src="@(product.Product.ImagePath??productImagePlaceholder)" height="50" alt="...">
+                            </td>
+                            <td>@product.Product.Name</td>
+                            <td>@string.Format("{0:N}",product.Product.Price) ₴</td>
+                            <td>@product.Product.CategoryName</td>
+                            <td><div class="d-flex justify-content-center">@product.StorageQuantity</div></td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    @if (@User.IsInRole("Admin"))
+                                    {
+                                        <form asp-controller="Storage" asp-action="UpdateQuantity" method="post" class="d-flex justify-content-center">
+                                            <input type="hidden" name="productId" value="@product.Product.Id" />
+                                            <input type="number" name="quantity" value="0" min="0" max="@product.Product.StorageQuantity ?? 0" />
+                                            <input type="hidden" name="storageQuantity" value="@product.StorageQuantity" />
+
+                                            <button type="submit" class="btn btn-success">Accept</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    }
+    else
+    {
+        <h3>Products was not found...</h3>
+    }
+
+</div>

@@ -1,0 +1,8 @@
+﻿.product-card {
+    transition: transform 0.3s; /* Збільшення картки з анімацією */
+    margin-bottom: 0; /* Видаляємо проміжок між карточками */
+}
+
+    .product-card:hover {
+        transform: scale(1.1); /* Збільшення картки при наведенні */
+    }

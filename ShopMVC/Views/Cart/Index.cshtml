@@ -1,0 +1,87 @@
+﻿@using ShopMVC.Helper
+@model List<ProductCartViewModel>
+@{
+    string productImagePlaceholder = @"https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+}
+
+<div class="container">
+    @if (Model.Any())
+    {
+        <h3>Count product: @Model.Count()</h3>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"><div class="d-flex justify-content-center">id</div></th>
+                        <th scope="col"><div class="d-flex justify-content-center">Image</div></th>
+                        <th scope="col"><div class="d-flex justify-content-center">Name</div></th>
+                        <th scope="col" style="width: 150px; "><div class="d-flex justify-content-center">Quantity</div></th>
+                        <th scope="col"><div class="d-flex justify-content-center">Price</div></th>
+                        <th scope="col" width="150px"><div class="d-flex justify-content-center">Total Price</div></th>
+                        <th scope="col"><div class="d-flex justify-content-center">Category</div></th>
+                        <th scope="col"><div class="d-flex justify-content-center">Operations</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <th scope="row"><div class="d-flex justify-content-center">@product.Product.Id</div></th>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <img style="width: 100px" src="@(product.Product.ImagePath??productImagePlaceholder)" class="card-img-top" alt="...">
+                                </div>
+                            </td>
+                            <td><div class="d-flex justify-content-center">@product.Product.Name</div></td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+
+                                    <form asp-controller="Cart" asp-action="UpdateQuantity" method="post">
+                                        <input type="hidden" name="productId" value="@product.Product.Id" />
+                                        <button style="width: 25px;" class="btn btn-sm btn-danger decrease" name="quantity" value="@(product.Quantity - 1)" data-product-id="@product.Product.Id">-</button>
+                                        <span style="width: 30px; display: inline-block; text-align: center;" id="quantity-@product.Product.Id">@product.Quantity</span>
+                                        <button style="width: 25px;" class="btn btn-sm btn-success increase" name="quantity" value="@(product.Quantity + 1)" data-product-id="@product.Product.Id">+</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td><div class="d-flex justify-content-center" id="product-price-@product.Product.Id">@string.Format("{0:N}", product.Product.Price) ₴</div></td>
+                            <td>
+                                <div class="d-flex justify-content-center" id="product-total-@product.Product.Id">
+                                    @string.Format("{0:N}", product.Product.Price * product.Quantity) ₴
+                                </div>
+                            </td>
+@*                            <td><div class="d-flex justify-content-center">@product.Product.Category?.Name</div></td>
+*@                            <td>
+                                <div class="d-flex justify-content-center">
+
+                                    <a asp-controller="Cart" asp-action="Remove" asp-route-id=@product.Product.Id class="link-danger link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover me-2">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="d-flex justify-content-end"><b>Total: </b> <div id="total-amount" class="d-flex justify-content-end">@string.Format("{0:N}", Model.Sum(p => p.Product.Price * p.Quantity)) ₴</div></p>
+            
+            <form asp-controller="Order" asp-action="CreateOrder" method="post" class="d-flex justify-content-end">
+                @foreach (var product in Model)
+                {
+                    <input type="hidden" name="productId[]" value="@product.Product.Id" />
+                    <input type="hidden" name="quantity[]" value="@product.Quantity" />
+                }
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </form>
+            
+@*            <a asp-controller="Order" asp-action="CreateOrder" class="btn btn-primary">Confirm</a>*@
+        </div>
+
+    }
+    else
+    {
+        <h3>Products was not found in CART...</h3>
+    }
+
+</div>

@@ -1,0 +1,65 @@
+﻿@using System.Text.Json;
+@model OrdersProductViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="list-group list-group-numbered col-6">
+            @if (Model.Orders.Any())
+            {
+                @foreach (var order in Model.Orders)
+                {
+                    <div class="accordion" id="accordionPanelsStayOpenExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#orderCollapse-@order.Id" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                                    <div class="fw-bold">Order # @order.Id</div>
+                                </button>
+                            </h2>
+                            <div id="orderCollapse-@order.Id" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    @if (!string.IsNullOrEmpty(order.IdsProduct))
+                                    {
+                                        var productIds = JsonSerializer.Deserialize<Dictionary<int, int>>(order.IdsProduct);
+                                        foreach (var productId in productIds.Keys)
+                                        {
+                                            var product = Model.Products.FirstOrDefault(p => p.Id == productId);
+                                            if (product != null)
+                                            {
+                                                <hr>
+                                                <img src="@product.ImagePath" height="50" />
+                                                <br>
+                                                <span><b>Name:</b> @product.Name</span>
+                                                <br>
+                                                <span><b>Description:</b> @product.Description</span>
+                                                <br>
+                                                <span><b>Price:</b> @string.Format("{0:N}",product.Price) $</span>
+                                                <br>
+                                                <a asp-controller="Product" asp-action="Details" asp-route-id="@productId">View product</a>
+                                                <br>
+                                                <span id ="quantity-@productId"><b>Quantity:</b> @productIds[productId]</span>
+
+                                                <br>
+                                                <span><b>Total Price:</b> @string.Format("{0:N}",(product.Price * productIds[productId])) $</span>
+
+                                            }
+                                        }
+                                    }
+                                    <hr>
+                                    <span><b>Order date:</b> @order.OrderDate</span><br>
+                                    <span><b>Total Sum:</b></span>
+                                    <span class="badge bg-primary rounded-pill">@string.Format("{0:N}",order.TotalPrice) ₴</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h4>Order empty</h4>
+            }
+            <br />
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Continue shopping</a>
+        </div>
+    </div>
+</div>

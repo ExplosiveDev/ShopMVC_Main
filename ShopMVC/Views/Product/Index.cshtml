@@ -1,0 +1,81 @@
+﻿@using BusinessLogic.DTOs;
+@using Microsoft.AspNetCore.Identity;
+@model List<ProductDTO>
+@inject UserManager<User> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+@{
+    string productImagePlaceholder = @"https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+}
+
+<div class="container">
+    @if (Model.Any())
+    {
+        <h3>Count product: @Model.Count()</h3>
+        <div class="row">
+            @*<div class="d-inline m-3">*@
+            <div class="col-1 m-3">
+                @if (@User.IsInRole("Admin"))
+                {
+                <a asp-controller="Product" asp-action="Create" class="btn btn-primary">Create</a>
+                }
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Operations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <th scope="row">@product.Id</th>
+                            <td>
+
+                                <img src="@(product.ImagePath??productImagePlaceholder)" height="50" @*class="card-img-top"*@ alt="..." >
+                            </td>
+                            <td>@product.Name</td>
+                            <td>@string.Format("{0:N}",product.Price) ₴</td>
+                            <td>@product.CategoryName</td>
+                            <td>
+                                <div class="d-flex justify-content-evenly">
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id=@product.Id asp-route-returnUrl="@Context.Request.Path" class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover me-2">
+                                        Details
+                                    </a>
+                                    @if (@User.IsInRole("Admin"))
+                                    {
+
+
+                                    <a asp-controller="Product" asp-action="Edit" asp-route-id=@product.Id class="btn btn-success">
+                                        @*Edit*@
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <a asp-controller="Product" asp-action="Delete" asp-route-id=@product.Id class="btn btn-dark">
+                                        @*Delete*@
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    }
+    else
+    {
+        <h3>Products was not found...</h3>
+    }
+
+</div>

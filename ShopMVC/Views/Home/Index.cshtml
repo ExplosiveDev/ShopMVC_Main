@@ -1,0 +1,83 @@
+﻿@model HomePageViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    string productImagePlaceholder = @"https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+}
+
+<h4>List Products</h4>
+@if (Context.Request.Cookies.ContainsKey("name"))
+{
+    <p>    @Context.Request.Cookies["name"]</p>
+    <p>    @ViewBag.NameAuthor</p>
+}
+else
+{
+
+    <p>Not Cookies</p>
+}
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <!-- start col-3 -->
+            @*navigation category*@
+            <ul class="nav flex-column">
+                @foreach (var category in ViewBag.ListCategories)
+                {
+
+                    @if (ViewBag.ActiveCategoryId == category.Id)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-current="page">@category.Name</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="Index" asp-route-category_id="@category.Id" class="nav-link active" aria-current="page">@category.Name</a>
+                        </li>
+                    }
+                }
+            </ul>
+
+        </div> <!-- close col-3 -->
+        <div class="col-9">
+            <!-- start col-3 -->
+            @if (Model.AllProducts.Any())
+            {
+                <div class="row">
+                    @foreach (var product in Model.AllProducts)
+                    {
+                        await Html.RenderPartialAsync("_CardProductPartial", product);
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <h3>Products was not found...</h3>
+                </div>
+            }
+
+
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center">Top 4 Best Selling Products</h3>
+                            <div class="row">
+                                @foreach (var product in Model.TopProducts)
+                                {
+                                    await Html.RenderPartialAsync("_CardProductPartial", product);
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- close col-9 -->
+
+
+    </div> <!-- close row -->
+</div> <!-- close container -->
+
